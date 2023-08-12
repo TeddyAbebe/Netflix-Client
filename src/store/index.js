@@ -16,12 +16,10 @@ export const getGenres = createAsyncThunk("netflix/genres", async () => {
   const {
     data: { genres },
   } = await axios.get(`${TMDB_BASE_URL}/genre/movie/list?api_key=${API_KEY}`);
-  // console.log(data);
   return genres;
 });
 
 const createArrayFromRawData = (array, moviesArray, genres) => {
-  // console.log(array);
   array.forEach((movie) => {
     const movieGenres = [];
     movie.genre_ids.forEach((genre) => {
@@ -61,7 +59,6 @@ export const fetchMovies = createAsyncThunk(
       genres,
       true
     );
-    // console.log(data);
   }
 );
 
@@ -83,7 +80,20 @@ export const getUserLikedMovies = createAsyncThunk(
   async (email) => {
     const {
       data: { movies },
-    } = await axios.get(`http://localhost:5000/api/user/liked/${email}`);
+    } = await axios.get(`https://netflix-server-tnht.onrender.com/api/user/liked/${email}`);
+    return movies;
+  }
+);
+
+export const removeFromLikedMovies = createAsyncThunk(
+  "netflix/removeLiked",
+  async ({ email, movieId }) => {
+    const {
+      data: { movies },
+    } = await axios.put(`https://netflix-server-tnht.onrender.com/api/user/remove`, {
+      email,
+      movieId,
+    });
     return movies;
   }
 );
@@ -103,6 +113,9 @@ const NetflixSlice = createSlice({
       state.movies = action.payload;
     });
     builder.addCase(getUserLikedMovies.fulfilled, (state, action) => {
+      state.movies = action.payload;
+    });
+    builder.addCase(removeFromLikedMovies.fulfilled, (state, action) => {
       state.movies = action.payload;
     });
   },

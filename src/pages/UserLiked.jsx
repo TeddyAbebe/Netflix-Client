@@ -1,23 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 // import { useNavigate } from "react-router-dom";
-import { fetchMovies, getUserLikedMovies } from "../store";
+import { getUserLikedMovies } from "../store";
 import { firebaseAuth } from "../utils/firebase-config";
 import { onAuthStateChanged } from "firebase/auth";
 import { styled } from "styled-components";
 import Navbar from "../components/Navbar";
-import NoteAvailable from "./NoteAvailable";
-import Slider from "../components/Slider";
-import SelectGenre from "../components/SelectGenre";
 import { useNavigate } from "react-router-dom";
+import Card from "../components/Card";
 
 export default function UserLiked() {
   const [isScrolled, setIsScrolled] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const genresLoaded = useSelector((state) => state.netflix.genresLoaded);
   const movies = useSelector((state) => state.netflix.movies);
-  const genres = useSelector((state) => state.netflix.genres);
   const [email, setEmail] = useState(undefined);
 
   onAuthStateChanged(firebaseAuth, (currentUser) => {
@@ -29,18 +25,46 @@ export default function UserLiked() {
     if (email) {
       dispatch(getUserLikedMovies(email));
     }
-  }, []);
-
-  useEffect(() => {
-    if (genresLoaded) dispatch(fetchMovies({ type: "movies" }));
-  }, [dispatch, genresLoaded]);
+  }, [dispatch, email]);
 
   window.onscroll = () => {
-    setIsScrolled(window.pageYOffset === 0 ? false : true);
+    setIsScrolled(window.scrollY === 0 ? false : true);
     return () => (window.onscroll = null);
   };
 
-  return <Container>UserLiked</Container>;
+  return (
+    <Container>
+      <Navbar isScrolled={isScrolled} />
+      <div className="content flex column">
+        <h1>My List</h1>
+        <div className="grid flex">
+          {movies?.map((movie, index) => {
+            return (
+              <Card
+                movieData={movie}
+                index={index}
+                key={movie.id}
+                isLiked={true}
+              />
+            );
+          })}
+        </div>
+      </div>
+    </Container>
+  );
 }
 
-const Container = styled.div``;
+const Container = styled.div`
+  .content {
+    margin: 2.3rem;
+    margin-top: 8rem;
+    gap: 3rem;
+    h1 {
+      margin-left: 3rem;
+    }
+    .grid {
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+  }
+`;

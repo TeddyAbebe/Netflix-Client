@@ -10,9 +10,12 @@ import { BiChevronDown } from "react-icons/bi";
 import { onAuthStateChanged } from "firebase/auth";
 import { firebaseAuth } from "../utils/firebase-config";
 import axios from "axios";
+import { useDispatch } from "react-redux";
+import { removeFromLikedMovies } from "../store";
 
 export default React.memo(function Card({ movieData, isLiked = false }) {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [email, setEmail] = useState(undefined);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -23,7 +26,7 @@ export default React.memo(function Card({ movieData, isLiked = false }) {
 
   const addToList = async () => {
     try {
-      await axios.post("http://localhost:5000/api/user/add", {
+      await axios.post("https://netflix-server-tnht.onrender.com/api/user/add", {
         email,
         data: movieData,
       });
@@ -69,7 +72,14 @@ export default React.memo(function Card({ movieData, isLiked = false }) {
                 <RiThumbUpFill title="Like" />
                 <RiThumbDownFill title="Dislike" />
                 {isLiked ? (
-                  <BsCheck title="Remove From List " />
+                  <BsCheck
+                    title="Remove From List"
+                    onClick={() =>
+                      dispatch(
+                        removeFromLikedMovies({ movieId: movieData.id, email })
+                      )
+                    }
+                  />
                 ) : (
                   <AiOutlinePlus title="Add to my list" onClick={addToList} />
                 )}
@@ -99,7 +109,7 @@ const Container = styled.div`
   cursor: pointer;
   position: relative;
   img {
-    border-radius: 0.2rem;
+    border-radius: 0.5rem;
     width: 100%;
     height: 100%;
     z-index: 10;
@@ -111,7 +121,7 @@ const Container = styled.div`
     position: absolute;
     top: -18vh;
     left: 0;
-    border-radius: 0.3rem;
+    border-radius: 0.5rem;
     box-shadow: rgba(0, 0, 0, 0.75) 0px 3px 10px;
     background-color: #181818;
     transition: 0.3s ease-in-out;
@@ -122,7 +132,7 @@ const Container = styled.div`
         width: 100%;
         height: 140px;
         object-fit: cover;
-        border-radius: 0.3rem;
+        border-radius: 0.5rem;
         top: 0;
         z-index: 4;
         position: absolute;

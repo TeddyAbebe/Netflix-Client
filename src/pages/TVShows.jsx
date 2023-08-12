@@ -27,7 +27,7 @@ export default function TVShows() {
   }, [dispatch, genresLoaded]);
 
   window.onscroll = () => {
-    setIsScrolled(window.pageYOffset === 0 ? false : true);
+    setIsScrolled(window.scrollY === 0 ? false : true);
     return () => (window.onscroll = null);
   };
 
